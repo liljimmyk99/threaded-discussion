@@ -1,5 +1,19 @@
 import { connection } from "./_dbConnection.js";
 
+
+function GetSortOrder(prop){
+  return function(a,b) {
+    if (a[prop] > b[prop]){
+      return 1;
+    }
+    if (a[prop] < b[prop]) {
+      return -1;
+    } 
+      return 0;
+    }
+
+}
+
 export default async function handler(req, res) {
   console.log(`Get Comment Endpoint: ${req}`)
 
@@ -13,8 +27,8 @@ export default async function handler(req, res) {
   // If there is a uid present that means we want a specific comment
   if (commentID === undefined){
     const [rows] = await connection.query('SELECT * FROM comments');
-    console.log(rows);
-    res.json(rows);
+    console.log(await rows.sort(GetSortOrder("submitted_time")));
+    res.json(await rows.sort(GetSortOrder("submitted_time")));
   } 
   const [rows] = await connection.query('SELECT * FROM comments WHERE uid = ?', commentID);
     console.log(rows[0]);
